@@ -365,9 +365,9 @@ class PreparedRequest(RequestEncodingMixin, RequestHooksMixin):
                 raise NotImplementedError('Streamed bodies and files are mutually exclusive.')
 
             if length:
-                self.headers['Content-Length'] = str(length)
+                self.headers[b'Content-Length'] = str(length)
             else:
-                self.headers['Transfer-Encoding'] = 'chunked'
+                self.headers[b'Transfer-Encoding'] = 'chunked'
         # Check if file, fo, generator, iterator.
         # If not, run through normal process.
 
@@ -386,22 +386,22 @@ class PreparedRequest(RequestEncodingMixin, RequestHooksMixin):
             self.prepare_content_length(body)
 
             # Add content-type if it wasn't explicitly provided.
-            if (content_type) and (not 'content-type' in self.headers):
-                self.headers['Content-Type'] = content_type
+            if (content_type) and (not b'content-type' in self.headers):
+                self.headers[b'Content-Type'] = content_type
 
         self.body = body
 
     def prepare_content_length(self, body):
         if hasattr(body, 'seek') and hasattr(body, 'tell'):
             body.seek(0, 2)
-            self.headers['Content-Length'] = str(body.tell())
+            self.headers[b'Content-Length'] = str(body.tell())
             body.seek(0, 0)
         elif body is not None:
             l = super_len(body)
             if l:
-                self.headers['Content-Length'] = str(l)
+                self.headers[b'Content-Length'] = str(l)
         elif self.method not in ('GET', 'HEAD'):
-            self.headers['Content-Length'] = '0'
+            self.headers[b'Content-Length'] = '0'
 
     def prepare_auth(self, auth, url=''):
         """Prepares the given HTTP auth data."""
@@ -436,7 +436,7 @@ class PreparedRequest(RequestEncodingMixin, RequestHooksMixin):
         if 'cookie' not in self.headers:
             cookie_header = get_cookie_header(cookies, self)
             if cookie_header is not None:
-                self.headers['Cookie'] = cookie_header
+                self.headers[b'Cookie'] = cookie_header
 
     def prepare_hooks(self, hooks):
         """Prepares the given hooks."""
